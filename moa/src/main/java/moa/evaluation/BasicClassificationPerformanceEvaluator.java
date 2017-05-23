@@ -20,19 +20,19 @@
  */
 package moa.evaluation;
 
-import moa.AbstractMOAObject;
 import moa.core.Example;
 import moa.core.Measurement;
 import moa.core.ObjectRepository;
 import moa.core.Utils;
 
 import com.yahoo.labs.samoa.instances.Instance;
-import com.yahoo.labs.samoa.instances.InstanceData;
 import com.yahoo.labs.samoa.instances.Prediction;
 import moa.options.AbstractOptionHandler;
 import moa.tasks.TaskMonitor;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Classification evaluator that performs basic incremental evaluation.
@@ -61,6 +61,10 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
     private int lastSeenClass;
 
     private double totalWeightObserved;
+    
+    protected Estimator[] precision;
+    
+    protected Estimator[] recall;
 
     @Override
     public void reset() {
@@ -71,9 +75,13 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
         this.numClasses = numClasses;
         this.rowKappa = new  Estimator[numClasses];
         this.columnKappa = new  Estimator[numClasses];
+        this.precision = new  Estimator[numClasses];
+        this.recall = new  Estimator[numClasses];
         for (int i = 0; i < this.numClasses; i++) {
             this.rowKappa[i] = newEstimator();
             this.columnKappa[i] = newEstimator();
+            this.precision[i] = newEstimator();
+            this.recall[i] = newEstimator();
         }
         this.weightCorrect = newEstimator();
         this.weightCorrectNoChangeClassifier = newEstimator();
@@ -93,11 +101,18 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
                 if (this.totalWeightObserved == 0) {
                     reset(inst.dataset().numClasses());
                 }
-                this.totalWeightObserved += weight;
+                this.totalWeightObserved += weight;//weight eh o numero da instancia
                 this.weightCorrect.add(predictedClass == trueClass ? weight : 0);
                 for (int i = 0; i < this.numClasses; i++) {
                     this.rowKappa[i].add(predictedClass == i ? weight: 0);
                     this.columnKappa[i].add(trueClass == i ? weight: 0);
+                    if(trueClass == i){
+                        precision[i].add(predictedClass == trueClass ? weight: 0);
+                    }
+                    if(predictedClass == i){
+                        recall[i].add(predictedClass == trueClass ? weight: 0);
+                    }
+                    
                 }
             }
             this.weightCorrectNoChangeClassifier.add(this.lastSeenClass == trueClass ? weight: 0);
@@ -120,18 +135,32 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
 
     @Override
     public Measurement[] getPerformanceMeasurements() {
-        return new Measurement[]{
-                new Measurement("classified instances",
-                    getTotalWeightObserved()),
-                new Measurement("classifications correct (percent)",
-                    getFractionCorrectlyClassified() * 100.0),
-                new Measurement("Kappa Statistic (percent)",
-                    getKappaStatistic() * 100.0),
-                new Measurement("Kappa Temporal Statistic (percent)",
-                    getKappaTemporalStatistic() * 100.0),
-                new Measurement("Kappa M Statistic (percent)",
-                        getKappaMStatistic() * 100.0)
-        };
+        List<Measurement> measurements = new ArrayList<>();
+        measurements.add( new Measurement("classified instances",
+                              getTotalWeightObserved()) );
+        measurements.add( new Measurement("classifications correct (percent)",
+                              getFractionCorrectlyClassified() * 100.0) );
+        measurements.add( new Measurement("Kappa Statistic (percent)",
+                              getKappaStatistic() * 100.0) );
+        measurements.add( new Measurement("Kappa Temporal Statistic (percent)",
+                              getKappaTemporalStatistic() * 100.0) );
+        measurements.add( new Measurement("Kappa M Statistic (percent)",
+                              getKappaMStatistic() * 100.0) );
+        measurements.add( new Measurement("Precision (percent)",
+                              getPrecisionStatistic() * 100.0) );
+        for(int i = 0; i < this.numClasses; i++){
+            measurements.add( new Measurement("Precision for class " + i + " (percent)",
+                                  getPrecisionStatistic(i) * 100.0) );
+        }
+        measurements.add( new Measurement("Recall (percent)",
+                              getRecallStatistic() * 100.0) );
+        for(int i = 0; i < this.numClasses; i++){
+            measurements.add( new Measurement("Recall for class " + i + " (percent)",
+                                  getRecallStatistic(i) * 100.0) );
+        }
+        Measurement[] result = new Measurement[measurements.size()];
+        
+        return measurements.toArray(result);
 
     }
 
@@ -172,7 +201,7 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
         }
     }
 
-    private double getKappaMStatistic() {
+    public double getKappaMStatistic() {
         if (this.getTotalWeightObserved() > 0.0) {
             double p0 = getFractionCorrectlyClassified();
             double pc = this.weightMajorityClassifier.estimation();
@@ -182,7 +211,31 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
             return 0;
         }
     }
+    
+    public double getPrecisionStatistic(){
+        double total = 0;
+        for (Estimator ck : this.precision) {
+            total += ck.estimation();
+        }
+        return total/this.precision.length;
+    }
+    
+    public double getPrecisionStatistic(int numClass){
+        return this.precision[numClass].estimation();
+    }
+    
+    public double getRecallStatistic(){
+        double total = 0;
+        for (Estimator ck : this.recall) {
+            total += ck.estimation();
+        }
+        return total/this.recall.length;
+    }
 
+    public double getRecallStatistic(int numClass){
+        return this.recall[numClass].estimation();
+    }
+    
     @Override
     public void getDescription(StringBuilder sb, int indent) {
         Measurement.getMeasurementsDescription(getPerformanceMeasurements(),

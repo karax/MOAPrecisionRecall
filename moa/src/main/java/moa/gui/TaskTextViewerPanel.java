@@ -342,6 +342,8 @@ public class TaskTextViewerPanel extends JPanel implements ActionListener {
             int timeColumn = 1;
             int memoryColumn = 9;
             int kappaTempColumn = 5;
+            int precisionColumn = 8;
+            int recallColumn = 11;
             if (this.taskManagerPanel instanceof CDTaskManagerPanel) {
                 accuracyColumn = 6;
                 kappaColumn = 4;
@@ -354,7 +356,7 @@ public class TaskTextViewerPanel extends JPanel implements ActionListener {
                 RamColumn = 2;
                 timeColumn = 1;
                 memoryColumn = 7;
-                kappaTempColumn = 5;
+                kappaTempColumn = 5;              
                 String[] tokensFirstLine = firstLine.split(",");
                 int i = 0;
                 for (String s : tokensFirstLine) {
@@ -371,7 +373,11 @@ public class TaskTextViewerPanel extends JPanel implements ActionListener {
                         timeColumn = i;
                     } else if (s.equals("model serialized size (bytes)")) {
                         memoryColumn = i;
-                    }
+                    } else if (s.equals("Precision (percent)")) {
+                        precisionColumn = i;
+                    } else if (s.equals("Recall (percent)")){
+                        recallColumn = i;
+                    }                    
                     i++;
                 }
             }
@@ -379,6 +385,7 @@ public class TaskTextViewerPanel extends JPanel implements ActionListener {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
                     String[] tokens = line.split(",");
+                    System.out.println(line);
                     this.acc1[0].addValue(0, round(parseDouble(tokens[accuracyColumn])));
                     this.acc1[0].addValue(1, round(parseDouble(tokens[kappaColumn])));
                     this.acc1[0].addValue(2, round(parseDouble(tokens[kappaTempColumn])));
@@ -387,6 +394,8 @@ public class TaskTextViewerPanel extends JPanel implements ActionListener {
                     }
                     this.acc1[0].addValue(4, round(parseDouble(tokens[timeColumn])));
                     this.acc1[0].addValue(5, round(parseDouble(tokens[memoryColumn]) / (1024 * 1024)));
+                    this.acc1[0].addValue(6, round(parseDouble(tokens[precisionColumn])));
+                    this.acc1[0].addValue(7, round(parseDouble(tokens[recallColumn])));
 
                     if (isSecondLine == true) {
                         processFrequency = Math.abs(parseDouble(tokens[0]));

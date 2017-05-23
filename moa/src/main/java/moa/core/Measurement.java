@@ -78,6 +78,7 @@ public class Measurement extends AbstractMOAObject {
             for (Measurement measurement : measurements) {
                 if (measurementNames.indexOf(measurement.getName()) < 0) {
                     measurementNames.add(measurement.getName());
+                    System.out.println(measurement.getName());
                 }
             }
         }

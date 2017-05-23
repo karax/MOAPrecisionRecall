@@ -33,13 +33,13 @@ public class Accuracy extends MeasureCollection implements ClassificationMeasure
 
     @Override
     public String[] getNames() {
-        String[] names = {"Accuracy", "Kappa", "Kappa Temp", "Ram-Hours", "Time", "Memory"};
+        String[] names = {"Accuracy", "Kappa", "Kappa Temp", "Ram-Hours", "Time", "Memory", "Precision", "Recall"};
         return names;
     }
 
     @Override
     protected boolean[] getDefaultEnabled() {
-        boolean[] defaults = {true, true, true, true, true, true};
+        boolean[] defaults = {true, true, true, true, true, true, true, true, true};
         return defaults;
     }
 
