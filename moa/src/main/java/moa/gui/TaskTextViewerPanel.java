@@ -385,7 +385,6 @@ public class TaskTextViewerPanel extends JPanel implements ActionListener {
                 while (scanner.hasNextLine()) {
                     String line = scanner.nextLine();
                     String[] tokens = line.split(",");
-                    System.out.println(line);
                     this.acc1[0].addValue(0, round(parseDouble(tokens[accuracyColumn])));
                     this.acc1[0].addValue(1, round(parseDouble(tokens[kappaColumn])));
                     this.acc1[0].addValue(2, round(parseDouble(tokens[kappaTempColumn])));
