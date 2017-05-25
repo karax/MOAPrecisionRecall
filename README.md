@@ -1,4 +1,4 @@
-This project is overall a clone of MOA (Massive Online Analysis) application, created by Waikato University, all its details are described bellow.
+This project is overall a clone of MOA (Massive Online Analysis) application, created by Waikato University. All its details are described bellow.
 Initally, me and Wilson Sasaki Jr are using it as a repository for a academic project using the application as base and adding some new features to it. In a near future we will try a pull request of this new features into the original project (https://github.com/Waikato/moa).
 New features:
 * Add precision/recall measurements to the BasicClassificationPerformanceEvaluator class.
