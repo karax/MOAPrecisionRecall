@@ -136,28 +136,20 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
     @Override
     public Measurement[] getPerformanceMeasurements() {
         List<Measurement> measurements = new ArrayList<>();
-        measurements.add( new Measurement("classified instances",
-                              getTotalWeightObserved()) );
-        measurements.add( new Measurement("classifications correct (percent)",
-                              getFractionCorrectlyClassified() * 100.0) );
-        measurements.add( new Measurement("Kappa Statistic (percent)",
-                              getKappaStatistic() * 100.0) );
-        measurements.add( new Measurement("Kappa Temporal Statistic (percent)",
-                              getKappaTemporalStatistic() * 100.0) );
-        measurements.add( new Measurement("Kappa M Statistic (percent)",
-                              getKappaMStatistic() * 100.0) );
-        measurements.add( new Measurement("Precision (percent)",
-                              getPrecisionStatistic() * 100.0) );
+        measurements.add( new Measurement("classified instances"              , this.getTotalWeightObserved()                ) );
+        measurements.add( new Measurement("classifications correct (percent)" , this.getFractionCorrectlyClassified() * 100.0) );
+        measurements.add( new Measurement("Kappa Statistic (percent)"         , this.getKappaStatistic()              * 100.0) );
+        measurements.add( new Measurement("Kappa Temporal Statistic (percent)", this.getKappaTemporalStatistic()      * 100.0) );
+        measurements.add( new Measurement("Kappa M Statistic (percent)"       , this.getKappaMStatistic()             * 100.0) );
+        measurements.add( new Measurement("F1 Score (percent)"                , this.getF1Statistic()                 * 100.0) );
+        measurements.add( new Measurement("Precision (percent)"               , this.getPrecisionStatistic()          * 100.0) );
+        measurements.add( new Measurement("Recall (percent)"                  , this.getRecallStatistic()             * 100.0) );
         for(int i = 0; i < this.numClasses; i++){
-            measurements.add( new Measurement("Precision for class " + i + " (percent)",
-                                  getPrecisionStatistic(i) * 100.0) );
+            measurements.add( new Measurement("F1 Score for class "  + i + " (percent)", 100.0 * this.getF1Statistic(i)        ) );
+            measurements.add( new Measurement("Precision for class " + i + " (percent)", 100.0 * this.getPrecisionStatistic(i) ) );
+            measurements.add( new Measurement("Recall for class "    + i + " (percent)", 100.0 * this.getRecallStatistic(i)    ) );
         }
-        measurements.add( new Measurement("Recall (percent)",
-                              getRecallStatistic() * 100.0) );
-        for(int i = 0; i < this.numClasses; i++){
-            measurements.add( new Measurement("Recall for class " + i + " (percent)",
-                                  getRecallStatistic(i) * 100.0) );
-        }
+        
         Measurement[] result = new Measurement[measurements.size()];
         
         return measurements.toArray(result);
@@ -234,6 +226,20 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
 
     public double getRecallStatistic(int numClass){
         return this.recall[numClass].estimation();
+    }
+    
+    public double getF1Statistic(){
+        return 2 * ( ( this.getPrecisionStatistic() * this.getRecallStatistic() ) 
+                      /
+                     ( this.getPrecisionStatistic() + this.getRecallStatistic() )
+                   );
+    }
+    
+    public double getF1Statistic(int numClass){
+        return 2 * ( ( this.getPrecisionStatistic(numClass) * this.getRecallStatistic(numClass) ) 
+                      /
+                     ( this.getPrecisionStatistic(numClass) + this.getRecallStatistic(numClass) )
+                   );
     }
     
     @Override
