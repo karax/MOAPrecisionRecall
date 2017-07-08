@@ -107,10 +107,10 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
                     this.rowKappa[i].add(predictedClass == i ? weight: 0);
                     this.columnKappa[i].add(trueClass == i ? weight: 0);
                     if(trueClass == i){
-                        precision[i].add(predictedClass == trueClass ? weight: 0);
+                        recall[i].add(predictedClass == trueClass ? weight: 0);
                     }
                     if(predictedClass == i){
-                        recall[i].add(predictedClass == trueClass ? weight: 0);
+                        precision[i].add(predictedClass == trueClass ? weight: 0);
                     }
                     
                 }
