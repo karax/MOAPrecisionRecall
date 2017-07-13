@@ -2,6 +2,7 @@ This project is overall a clone of MOA (Massive Online Analysis) application, cr
 Initally, me and Wilson Sasaki Jr are using it as a repository for a academic project using the application as base and adding some new features to it. In a near future we will try a pull request of this new features into the original project (https://github.com/Waikato/moa).
 New features:
 * Add precision/recall measurements to the BasicClassificationPerformanceEvaluator class.
+* Add F1 measurement to the BasicClassificationPerformanceEvaluator class.
 * <del> Add precision/recall mean/current to infopanel </del>
 
 
