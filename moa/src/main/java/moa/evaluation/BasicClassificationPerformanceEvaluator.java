@@ -25,6 +25,7 @@ import moa.core.Measurement;
 import moa.core.ObjectRepository;
 import moa.core.Utils;
 
+import com.github.javacliparser.FlagOption;
 import com.yahoo.labs.samoa.instances.Instance;
 import com.yahoo.labs.samoa.instances.Prediction;
 import moa.options.AbstractOptionHandler;
@@ -65,6 +66,15 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
     protected Estimator[] precision;
     
     protected Estimator[] recall;
+    
+    public FlagOption precisionPerClassOption = new FlagOption("precisionPerClass", 'p', 
+    		"Show precision for each class");
+    
+    public FlagOption recallPerClassOption = new FlagOption("recallPerClass", 'r',
+    		"Show recall for each class");
+    
+    public FlagOption f1PerClassOption = new FlagOption("f1PerClass", 'f', "Show f1 for each class");
+    
 
     @Override
     public void reset() {
@@ -143,12 +153,23 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
         measurements.add( new Measurement("Kappa M Statistic (percent)"       , this.getKappaMStatistic()             * 100.0) );
         measurements.add( new Measurement("F1 Score (percent)"                , this.getF1Statistic()                 * 100.0) );
         measurements.add( new Measurement("Precision (percent)"               , this.getPrecisionStatistic()          * 100.0) );
-        measurements.add( new Measurement("Recall (percent)"                  , this.getRecallStatistic()             * 100.0) );
-        for(int i = 0; i < this.numClasses; i++){
-            measurements.add( new Measurement("F1 Score for class "  + i + " (percent)", 100.0 * this.getF1Statistic(i)        ) );
-            measurements.add( new Measurement("Precision for class " + i + " (percent)", 100.0 * this.getPrecisionStatistic(i) ) );
-            measurements.add( new Measurement("Recall for class "    + i + " (percent)", 100.0 * this.getRecallStatistic(i)    ) );
+        measurements.add( new Measurement("Recall (percent)"                  , this.getRecallStatistic()             * 100.0) );       
+        if (f1PerClassOption.isSet()) {
+        	for(int i = 0; i < this.numClasses; i++) {
+        		measurements.add( new Measurement("F1 Score for class "  + i + " (percent)", 100.0 * this.getF1Statistic(i)        ) );
+        	}
         }
+        if (precisionPerClassOption.isSet()) {
+        	for(int i = 0; i < this.numClasses; i++) {
+        		measurements.add( new Measurement("Precision for class " + i + " (percent)", 100.0 * this.getPrecisionStatistic(i) ) );
+        	}
+        }
+        if (recallPerClassOption.isSet()) {
+        	for(int i = 0; i < this.numClasses; i++) {
+        		measurements.add( new Measurement("Recall for class "    + i + " (percent)", 100.0 * this.getRecallStatistic(i)    ) );
+        	}
+        }
+        
         
         Measurement[] result = new Measurement[measurements.size()];
         
