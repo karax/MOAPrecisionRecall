@@ -111,7 +111,7 @@ public class BasicClassificationPerformanceEvaluator extends AbstractOptionHandl
                 if (this.totalWeightObserved == 0) {
                     reset(inst.dataset().numClasses());
                 }
-                this.totalWeightObserved += weight;//weight eh o numero da instancia
+                this.totalWeightObserved += weight;
                 this.weightCorrect.add(predictedClass == trueClass ? weight : 0);
                 for (int i = 0; i < this.numClasses; i++) {
                     this.rowKappa[i].add(predictedClass == i ? weight: 0);
